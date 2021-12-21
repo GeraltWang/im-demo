@@ -41,7 +41,7 @@
       <a-col :span="8">
         <a-card title="用户信息" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
           <!-- 用户信息 -->
-          <a-descriptions :column="{ xs: 2, sm: 2, md: 2 }">
+          <a-descriptions :column="{ xs: 1, sm: 2, md: 2 }">
             <a-descriptions-item label="UserName">{{ loginState.info?.user?.username || '' }}</a-descriptions-item>
             <a-descriptions-item label="activated">{{ loginState.info?.user?.activated || '' }}</a-descriptions-item>
             <a-descriptions-item label="type">{{ loginState.info?.user?.type || '' }}</a-descriptions-item>
@@ -53,7 +53,7 @@
     <a-row :gutter="[24, 32]">
       <a-col :span="12">
         <!-- 发送消息 -->
-        <a-card title="发送消息" :bordered="false" hoverable>
+        <a-card :title="`发送消息 to ${chatObj ? chatObj : '请选择联系人'}`" :bordered="false" hoverable>
           <a-form-item label="内容">
             <a-input v-model:value="msg" allow-clear />
           </a-form-item>
@@ -88,9 +88,9 @@
   </div>
 </template>
 <script setup>
-import conn from '@/utils/WebIM';
+import { conn, WebIM } from '@/utils/WebIM';
 import { computed, reactive, ref } from 'vue';
-import { message } from 'ant-design-vue';
+import { message, notification } from 'ant-design-vue';
 import { useStore } from 'vuex';
 import { getFriends } from '@/api/hxRegister'
 
@@ -117,7 +117,7 @@ const formState = reactive({
   username: '',
   password: '',
   nickname: '',
-  appKey: '1118211220116106#demo',
+  appKey: WebIM.config.appkey,
   success: (res) => {
     console.log(res);
     loadingCtrl.regLoading = false
@@ -165,7 +165,7 @@ const resetLoginForm = () => {
 const loginForm = reactive({
   user: '',
   pwd: '',
-  appKey: '1118211220116106#demo',
+  appKey: WebIM.config.appkey,
   success: (res) => {
     console.log(res);
     loadingCtrl.loginLoading = false
@@ -206,7 +206,9 @@ const contact = (item) => {
 
 // 发送单聊文字消息
 const sendMsg = () => {
+  // 生成唯一的消息id
   let id = conn.getUniqueId()
+  // 设定消息类型
   let msgType = new WebIM.message('txt', id);
   msgType.set({
     msg: msg.value,                  // 消息内容
@@ -220,6 +222,7 @@ const sendMsg = () => {
     // },                                  //扩展消息
     success: (id, serverMsgId) => {
       console.log('send private text Success');
+      message.success('发送消息成功')
     },
     fail: (e) => {
       // 失败原因:
@@ -233,10 +236,30 @@ const sendMsg = () => {
       // e.type === '502' 被设置的自定义拦截捕获
       // e.type === '503' 未知错误
       console.log("Send private text error", e);
+      message.error('发送消息失败，移步console查看错误信息')
     }
   });
   conn.send(msgType.body);
 }
+
+// 开启监听
+conn.listen({
+  onOpened: () => { message.success('连接成功') },                  //连接成功回调 
+  onClosed: () => { message.success('连接关闭') },                  //连接关闭回调
+  onTextMessage: (message) => {
+    console.log(message)
+    notification.open({
+      message: `来自 ${message.from} 的新消息`,
+      description: message.data,
+      placement: 'bottomRight'
+    })
+  },
+  onEmojiMessage: function (message) { },   //收到表情消息
+  onPictureMessage: function (message) { }, //收到图片消息
+  onCmdMessage: function (message) { },     //收到命令消息
+  onAudioMessage: function (message) { },   //收到音频消息
+  onLocationMessage: function (message) { },//收到位置消息
+})
 </script>
 <style lang="less" scoped>
 .chat-index {
