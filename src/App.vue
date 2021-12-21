@@ -6,6 +6,6 @@
 </script>
 <style lang="less">
 body {
-  background-color: #ccc;
+  background-color: rgb(241, 241, 241);
 }
 </style>

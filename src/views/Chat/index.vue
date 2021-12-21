@@ -108,7 +108,9 @@ const loadingCtrl = reactive({
 
 // 用户信息存储
 const loginState = reactive({
-  info: computed(() => store.state.user),
+  // 用户信息
+  info: computed(() => store.state.user || {}),
+  // 好友列表
   friendsList: []
 })
 
@@ -160,6 +162,7 @@ const resetRegForm = () => {
   regForm.value.resetFields()
 }
 
+// 登录表单清空
 const resetLoginForm = () => {
   loginFormR.value.resetFields()
 }
@@ -267,11 +270,9 @@ conn.listen({
 <style lang="less" scoped>
 .chat-index {
   box-sizing: border-box;
-  // background-color: #ccc;
   padding: 15px;
   .chat-content {
     width: 100%;
-    // height: 100vh;
   }
   .ant-row {
     margin-bottom: 20px;
