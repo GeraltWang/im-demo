@@ -4,6 +4,8 @@
 <script setup>
 
 </script>
-<style lang="less" scoped>
-  
+<style lang="less">
+body {
+  background-color: #ccc;
+}
 </style>

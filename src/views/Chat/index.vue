@@ -1,94 +1,97 @@
 <template>
   <div class="chat-index">
-    <a-row :gutter="[24, 32]">
-      <a-col :span="8">
-        <a-card title="注册" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
-          <!-- 注册 -->
-          <a-form :model="formState" ref="regForm">
-            <a-form-item label="账号" name="username">
-              <a-input v-model:value="formState.username" allow-clear />
+    <div class="chat-content">
+      <a-row :gutter="[24, 24]">
+        <a-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+          <a-card title="注册" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
+            <!-- 注册 -->
+            <a-form :model="formState" ref="regForm">
+              <a-form-item label="账号" name="username">
+                <a-input v-model:value="formState.username" allow-clear />
+              </a-form-item>
+              <a-form-item label="密码" name="password">
+                <a-input v-model:value="formState.password" type="password" allow-clear />
+              </a-form-item>
+              <a-form-item label="昵称" name="nickname">
+                <a-input v-model:value="formState.nickname" allow-clear />
+              </a-form-item>
+              <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
+                <a-button type="primary" @click="onSubmit" :loading="loadingCtrl.regLoading">注册</a-button>
+                <a-button style="margin-left: 10px" @click="resetRegForm">Cancel</a-button>
+              </a-form-item>
+            </a-form>
+          </a-card>
+        </a-col>
+        <a-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+          <a-card title="登录" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
+            <!-- 登录 -->
+            <a-form :model="loginForm" ref="loginFormR">
+              <a-form-item label="账号" name="user">
+                <a-input v-model:value="loginForm.user" allow-clear />
+              </a-form-item>
+              <a-form-item label="密码" name="password">
+                <a-input v-model:value="loginForm.pwd" type="password" allow-clear />
+              </a-form-item>
+              <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
+                <a-button type="primary" @click="loginByPwd" :loading="loadingCtrl.loginLoading">登录</a-button>
+                <a-button style="margin-left: 10px" @click="resetLoginForm">Cancel</a-button>
+              </a-form-item>
+            </a-form>
+          </a-card>
+        </a-col>
+        <a-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+          <a-card title="用户信息" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
+            <!-- 用户信息 -->
+            <a-descriptions :column="{ xs: 1, sm: 2, md: 2 }">
+              <a-descriptions-item label="UserName">{{ loginState.info?.user?.username || '' }}</a-descriptions-item>
+              <a-descriptions-item label="activated">{{ loginState.info?.user?.activated || '' }}</a-descriptions-item>
+              <a-descriptions-item label="type">{{ loginState.info?.user?.type || '' }}</a-descriptions-item>
+              <a-descriptions-item label="uuid">{{ loginState.info?.user?.uuid || '' }}</a-descriptions-item>
+            </a-descriptions>
+          </a-card>
+        </a-col>
+      </a-row>
+      <a-row :gutter="[24, 24]">
+        <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+          <!-- 发送消息 -->
+          <a-card :title="`发送消息 to ${chatObj ? chatObj : '请选择联系人'}`" :bordered="false" hoverable>
+            <a-form-item label="内容">
+              <a-input v-model:value="msg" allow-clear />
             </a-form-item>
-            <a-form-item label="密码" name="password">
-              <a-input v-model:value="formState.password" type="password" allow-clear />
-            </a-form-item>
-            <a-form-item label="昵称" name="nickname">
-              <a-input v-model:value="formState.nickname" allow-clear />
-            </a-form-item>
-            <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
-              <a-button type="primary" @click="onSubmit" :loading="loadingCtrl.regLoading">注册</a-button>
-              <a-button style="margin-left: 10px" @click="resetRegForm">Cancel</a-button>
-            </a-form-item>
-          </a-form>
-        </a-card>
-      </a-col>
-      <a-col :span="8">
-        <a-card title="登录" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
-          <!-- 登录 -->
-          <a-form :model="loginForm" ref="loginFormR">
-            <a-form-item label="账号" name="user">
-              <a-input v-model:value="loginForm.user" allow-clear />
-            </a-form-item>
-            <a-form-item label="密码" name="password">
-              <a-input v-model:value="loginForm.pwd" type="password" allow-clear />
-            </a-form-item>
-            <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
-              <a-button type="primary" @click="loginByPwd" :loading="loadingCtrl.loginLoading">登录</a-button>
-              <a-button style="margin-left: 10px" @click="resetLoginForm">Cancel</a-button>
-            </a-form-item>
-          </a-form>
-        </a-card>
-      </a-col>
-      <a-col :span="8">
-        <a-card title="用户信息" :bordered="false" hoverable :bodyStyle="{ minHeight: '260px' }">
-          <!-- 用户信息 -->
-          <a-descriptions :column="{ xs: 1, sm: 2, md: 2 }">
-            <a-descriptions-item label="UserName">{{ loginState.info?.user?.username || '' }}</a-descriptions-item>
-            <a-descriptions-item label="activated">{{ loginState.info?.user?.activated || '' }}</a-descriptions-item>
-            <a-descriptions-item label="type">{{ loginState.info?.user?.type || '' }}</a-descriptions-item>
-            <a-descriptions-item label="uuid">{{ loginState.info?.user?.uuid || '' }}</a-descriptions-item>
-          </a-descriptions>
-        </a-card>
-      </a-col>
-    </a-row>
-    <a-row :gutter="[24, 32]">
-      <a-col :span="12">
-        <!-- 发送消息 -->
-        <a-card :title="`发送消息 to ${chatObj ? chatObj : '请选择联系人'}`" :bordered="false" hoverable>
-          <a-form-item label="内容">
-            <a-input v-model:value="msg" allow-clear />
-          </a-form-item>
-          <a-button @click="sendMsg" type="primary">发送</a-button>
-        </a-card>
-      </a-col>
-      <a-col :span="12">
-        <!-- 好友列表 -->
-        <a-card title="好友列表" :bordered="false" hoverable>
-          <a-list item-layout="horizontal" :data-source="loginState.friendsList">
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template #title>
-                    <a href="javascript:void(0)">{{ item }}</a>
+            <a-button @click="sendMsg" type="primary">发送</a-button>
+          </a-card>
+        </a-col>
+        <a-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+          <!-- 好友列表 -->
+          <a-card title="好友列表" :bordered="false" hoverable>
+            <a-list item-layout="horizontal" :data-source="loginState.friendsList">
+              <template #renderItem="{ item }">
+                <a-list-item>
+                  <a-list-item-meta>
+                    <template #title>
+                      <a href="javascript:void(0)">{{ item }}</a>
+                    </template>
+                    <template #avatar>
+                      <a-avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                      />
+                    </template>
+                  </a-list-item-meta>
+                  <template #actions>
+                    <a href="javascript:void(0)" @click="contact(item)">contact</a>
                   </template>
-                  <template #avatar>
-                    <a-avatar
-                      src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                    />
-                  </template>
-                </a-list-item-meta>
-                <template #actions>
-                  <a href="javascript:void(0)" @click="contact(item)">contact</a>
-                </template>
-              </a-list-item>
-            </template>
-          </a-list>
-        </a-card>
-      </a-col>
-    </a-row>
+                </a-list-item>
+              </template>
+            </a-list>
+          </a-card>
+        </a-col>
+      </a-row>
+    </div>
   </div>
 </template>
 <script setup>
-import { conn, WebIM } from '@/utils/WebIM';
+import conn from '@/utils/WebIM';
+import config from '@/utils/WebIMConfig'
 import { computed, reactive, ref } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import { useStore } from 'vuex';
@@ -117,7 +120,7 @@ const formState = reactive({
   username: '',
   password: '',
   nickname: '',
-  appKey: WebIM.config.appkey,
+  appKey: config.appkey,
   success: (res) => {
     console.log(res);
     loadingCtrl.regLoading = false
@@ -165,7 +168,7 @@ const resetLoginForm = () => {
 const loginForm = reactive({
   user: '',
   pwd: '',
-  appKey: WebIM.config.appkey,
+  appKey: config.appkey,
   success: (res) => {
     console.log(res);
     loadingCtrl.loginLoading = false
@@ -263,10 +266,13 @@ conn.listen({
 </script>
 <style lang="less" scoped>
 .chat-index {
-  height: 100vh;
   box-sizing: border-box;
-  background-color: #ccc;
+  // background-color: #ccc;
   padding: 15px;
+  .chat-content {
+    width: 100%;
+    // height: 100vh;
+  }
   .ant-row {
     margin-bottom: 20px;
     .ant-card {
