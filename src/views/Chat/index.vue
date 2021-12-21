@@ -94,6 +94,7 @@ import { message } from 'ant-design-vue';
 import { useStore } from 'vuex';
 import { getFriends } from '@/api/hxRegister'
 
+// 引入 vuex
 const store = useStore()
 
 // 加载状态控制
@@ -245,6 +246,10 @@ const sendMsg = () => {
   padding: 15px;
   .ant-row {
     margin-bottom: 20px;
+    .ant-card {
+      border-radius: 10px;
+      min-height: 300px;
+    }
   }
 }
 </style>
